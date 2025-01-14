@@ -19,9 +19,18 @@ class MoviesController extends Controller
         $this->middleware('isAdmin')->except(['index', 'show']);
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $movies = Movie::all();
+        $query = Movie::query();
+        if ($request->has('search')) {
+            $searching = $request->input('search');
+            $query->where('title', "LIKE", "%$searching%");
+        };
+
+
+        $perpage = $request->input('per_page', 3);
+
+        $movies = $query->paginate($perpage);
 
         return response([
             "message" => "tampil data berhasil",
